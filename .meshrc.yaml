@@ -1,0 +1,37 @@
+sources:
+  - name: Shopify
+    handler:
+      graphql:
+        endpoint: 'https://{env.SHOP_NAME}.myshopify.com/api/{env.SHOP_API_VERSION}/graphql.json'
+        schemaHeaders:
+          X-Shopify-Storefront-Access-Token: '{env.SHOP_ACCESS_TOKEN}'
+        operationHeaders:
+          X-Shopify-Storefront-Access-Token: '{env.SHOP_ACCESS_TOKEN}'
+    transforms:
+      - cache:
+          - field: Query.product
+
+  - name: Contentful
+    handler:
+      graphql:
+        endpoint: 'https://graphql.contentful.com/content/v1/spaces/{env.CONTENFUL_SPACE}/environments/{env.CONTENFUL_ENVIRONMENT}'
+        schemaHeaders:
+          Authorization: 'Bearer {env.CONTENFUL_TOKEN}'
+        operationHeaders:
+          Authorization: 'Bearer {env.CONTENFUL_TOKEN}'
+
+additionalTypeDefs: |
+  extend type Product {
+    contentfuProduct: ContentfuProduct
+  }
+
+additionalResolvers:
+  - targetTypeName: Product
+    targetFieldName: contentfuProduct
+    sourceName: Contentful
+    sourceFieldName: contentfuProductCollection
+    sourceTypeName: Query
+    sourceArgs:
+      where:
+        handle: '{root.handle}'
+    result: items[0]
