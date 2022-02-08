@@ -9,3 +9,10 @@ node_modules
 !.yarn/sdks
 !.yarn/versions
 .pnp.*
+
+# IDE
+.idea
+.project
+.classpath
+*.launch
+*.sublime-workspace
